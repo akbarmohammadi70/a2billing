@@ -10,6 +10,9 @@ services:
     container_name: mysql
     environment:
       MYSQL_ROOT_PASSWORD: P@ssw0rd
+      MYSQL_DATABASE: mya2billing 
+      MYSQL_USER: a2billinguser
+      MYSQL_PASSWORD: a2billing
     labels:
       - traefik.enable=false
     depends_on:
