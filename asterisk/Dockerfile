@@ -1,6 +1,26 @@
 FROM debian:buster-slim
+WORKDIR /app
+COPY ./sounds/install_a2b_sounds.sh /app
 RUN apt-get update -y
-RUN apt-get install asterisk apache2 -y
+RUN apt-get install asterisk apache2 apt-utils -y
 RUN sed -i "s/rtpstart=10000/rtpstart=16384/g" /etc/asterisk/rtp.conf
 RUN sed -i "s/rtpend=20000/rtpend=16394/g" /etc/asterisk/rtp.conf
-#ENTRYPOINT ["/etc/init.d/asterisk" , "start"]
+RUN chmod 777 /etc/asterisk
+RUN touch /etc/asterisk/additional_a2billing_iax.conf
+RUN touch /etc/asterisk/additional_a2billing_sip.conf
+RUN echo \#include additional_a2billing_sip.conf >> /etc/asterisk/sip.conf
+RUN echo \#include additional_a2billing_iax.conf >> /etc/asterisk/iax.conf
+RUN chown -Rf www-data /etc/asterisk/additional_a2billing_iax.conf
+RUN chown -Rf www-data /etc/asterisk/additional_a2billing_sip.conf
+COPY ./sounds/ /app
+RUN chmod +x /app/install_a2b_sounds.sh && /app/install_a2b_sounds.sh
+RUN chown -R asterisk:asterisk /usr/share/asterisk/sounds/
+COPY ./manager.conf /etc/asterisk/
+#RUN mkdir /usr/share/asterisk/agi-bin 
+RUN chown asterisk:asterisk /usr/share/asterisk/agi-bin
+COPY ./a2billing.php /usr/share/asterisk/agi-bin/
+COPY a2billing_monitoring.php /usr/share/asterisk/agi-bin/
+COPY common/lib /usr/share/asterisk/agi-bin/
+RUN chmod +x /usr/share/asterisk/agi-bin/a2billing.php
+RUN chmod +x /usr/share/asterisk/agi-bin/a2billing_monitoring.php
+
