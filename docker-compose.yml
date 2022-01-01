@@ -1,0 +1,81 @@
+version: '3.9'
+services: 
+  mysql:
+    image: mysql:5.6
+    restart: always
+    volumes:
+      - /root/data/:/var/lib/mysql:rw
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: P@ssw0rd
+    labels:
+      - traefik.enable=false
+    depends_on:
+      - mysql
+    networks:
+      - internal
+  asterisk:
+    image: as 
+    restart: always
+    container_name: asterisk
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      - internal
+    depends_on:
+      - mysql
+  admin:
+    image: admin
+    restart: always
+    container_name: admin
+    labels:
+      - traefik.http.routers.admin.rule=Host(`admin.voip.com`)
+      - traefik.port=80
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      - internal
+    depends_on:
+      - mysql
+  customer:
+    image: customer
+    restart: always
+    container_name: customer
+    labels:
+      - traefik.http.routers.customer.rule=Host(`customer.voip.com`)
+      - traefik.port=80
+    volumes: 
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      - internal
+    depends_on:
+      - mysql
+  traefik:
+    image: traefik:v2.2
+    restart: alwayis
+    container_name: traefik
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./traefik/traefik.toml:/traefik.toml
+      - ./traefik/traefik_dynamic.toml:/traefik_dynamic.toml
+
+    networks:
+      - web
+      - internal
+    ports:
+    - "80:80"
+    - "5060:5060"
+
+networks:
+  web:
+    external: true
+  internal:
+    external: false
+
