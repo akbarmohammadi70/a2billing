@@ -7,8 +7,6 @@ services:
       - /root/data/:/var/lib/mysql:rw
       - ./DataBase/mysql-5.x/:/database/
       - ./a2billing.conf:/etc/a2billing.conf
-      - /etc/timezone:/etc/timezone:ro
-      - /etc/localtime:/etc/localtime:ro
     container_name: mysql
     environment:
       MYSQL_ROOT_PASSWORD: P@ssw0rd
@@ -17,19 +15,14 @@ services:
       MYSQL_PASSWORD: a2billing
     labels:
       - traefik.enable=false
-    depends_on:
-      - mysql
     networks:
-      - internal
+      - web
   asterisk:
     image: asterisk
     restart: always
     container_name: asterisk
-    volumes:
-      - /etc/timezone:/etc/timezone:ro
-      - /etc/localtime:/etc/localtime:ro
     networks:
-      - internal
+      - web
     depends_on:
       - mysql
   admin:
@@ -39,11 +32,9 @@ services:
     labels:
       - traefik.http.routers.admin.rule=Host(`admin.voip.com`)
       - traefik.port=80
-    volumes:
-      - /etc/timezone:/etc/timezone:ro
-      - /etc/localtime:/etc/localtime:ro
+    
     networks:
-      - internal
+      - web
     depends_on:
       - mysql
   customer:
@@ -53,34 +44,28 @@ services:
     labels:
       - traefik.http.routers.customer.rule=Host(`customer.voip.com`)
       - traefik.port=80
-    volumes: 
-      - /etc/timezone:/etc/timezone:ro
-      - /etc/localtime:/etc/localtime:ro
+    
     networks:
-      - internal
+      - web
     depends_on:
       - mysql
   traefik:
     image: traefik:v2.2
-    restart: alwayis
+    restart: always
     container_name: traefik
     volumes:
-      - /etc/timezone:/etc/timezone:ro
-      - /etc/localtime:/etc/localtime:ro
       - /var/run/docker.sock:/var/run/docker.sock
       - ./traefik/traefik.toml:/traefik.toml
       - ./traefik/traefik_dynamic.toml:/traefik_dynamic.toml
 
     networks:
       - web
-      - internal
     ports:
     - "80:80"
     - "5060:5060"
 
 networks:
   web:
-    external: true
-  internal:
-    external: false
+    driver: bridge
+    name: web
 
