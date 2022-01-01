@@ -5,6 +5,8 @@ services:
     restart: always
     volumes:
       - /root/data/:/var/lib/mysql:rw
+      - ./a2billing/DataBase/mysql-5.x/:/database/
+      - ./a2billing/a2billing.conf:/etc/
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
     container_name: mysql
@@ -20,7 +22,7 @@ services:
     networks:
       - internal
   asterisk:
-    image: as 
+    image: asterisk
     restart: always
     container_name: asterisk
     volumes:
