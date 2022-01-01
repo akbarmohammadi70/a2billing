@@ -1,4 +1,5 @@
 FROM php:5.6-apache
+MAINTAINER akbar.mohammadi70@gmail.com
 WORKDIR /var/www/a2billing
 COPY . .
 RUN chown -R www-data:www-data /var/www/a2billing

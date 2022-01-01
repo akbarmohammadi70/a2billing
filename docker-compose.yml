@@ -5,8 +5,8 @@ services:
     restart: always
     volumes:
       - /root/data/:/var/lib/mysql:rw
-      - ./a2billing/DataBase/mysql-5.x/:/database/
-      - ./a2billing/a2billing.conf:/etc/a2billing.conf
+      - ./DataBase/mysql-5.x/:/database/
+      - ./a2billing.conf:/etc/a2billing.conf
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
     container_name: mysql
