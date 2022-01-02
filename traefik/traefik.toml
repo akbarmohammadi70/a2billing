@@ -1,23 +1,32 @@
-[entryPoints]
- 
-[entryPoints.web]
- 
-address = ":80"
+[log]
+  level = "DEBUG"
+  filePath = "log-file.log"
+
+[accessLog]
+  filePath =  "log-access.log"
   
-[entryPoints.asterisk]
- 
-address = ":5060"
+
+
 
 [api]
-dashboard = true
+  dashboard = true
+  debug = true
+  insecure = true
 
-[providers.docker]
- 
-watch = true
- 
-network = "web"
- 
+[entryPoints]
+  [entryPoints.web]
+    address = ":80"
+  [entryPoints.tcp-asterisk]
+    address = ":5060"
+  [entryPoints.udp-asterisk]
+    address = ":5060/udp" 
+    
 [providers.file]
- 
-filename = "traefik_dynamic.toml"
+  filename = "traefik_dynamic.toml"
+
+[providers.docker]   
+  watch = true
+  network = "traefik"
+   
+
 

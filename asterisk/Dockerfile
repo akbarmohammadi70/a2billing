@@ -1,27 +1,16 @@
-FROM debian:buster-slim
-MAINTAINER akbar.mohammadi70@gmail.com       
-WORKDIR /app
-COPY ./sounds/install_a2b_sounds.sh /app
-RUN apt-get update -y
-RUN apt-get install asterisk apache2 apt-utils -y
-RUN sed -i "s/rtpstart=10000/rtpstart=16384/g" /etc/asterisk/rtp.conf
-RUN sed -i "s/rtpend=20000/rtpend=16394/g" /etc/asterisk/rtp.conf
-RUN chmod 777 /etc/asterisk
-RUN touch /etc/asterisk/additional_a2billing_iax.conf
-RUN touch /etc/asterisk/additional_a2billing_sip.conf
-RUN echo \#include additional_a2billing_sip.conf >> /etc/asterisk/sip.conf
-RUN echo \#include additional_a2billing_iax.conf >> /etc/asterisk/iax.conf
-RUN chown -Rf www-data /etc/asterisk/additional_a2billing_iax.conf
-RUN chown -Rf www-data /etc/asterisk/additional_a2billing_sip.conf
-COPY ./sounds/ /app
-RUN chmod +x /app/install_a2b_sounds.sh && /app/install_a2b_sounds.sh
-RUN chown -R asterisk:asterisk /usr/share/asterisk/sounds/
-COPY ./manager.conf /etc/asterisk/
-#RUN mkdir /usr/share/asterisk/agi-bin 
-RUN chown asterisk:asterisk /usr/share/asterisk/agi-bin
-COPY ./a2billing.php /usr/share/asterisk/agi-bin/
-COPY a2billing_monitoring.php /usr/share/asterisk/agi-bin/
-COPY common/lib /usr/share/asterisk/agi-bin/
-RUN chmod +x /usr/share/asterisk/agi-bin/a2billing.php
-RUN chmod +x /usr/share/asterisk/agi-bin/a2billing_monitoring.php
+FROM centos:6
+MAINTAINER akbar.mohammadi70@yahoo.com
 
+# Set up EPEL
+RUN curl -L http://download.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm -o /tmp/epel-release-6-8.noarch.rpm && \
+        rpm -ivh /tmp/epel-release-6-8.noarch.rpm && \
+        rm -f /tmp/epel-release-6-8.noarch.rpm
+
+# Update and install asterisk
+RUN yum update -y && yum install -y asterisk
+
+# Set config as a volume
+VOLUME /etc/asterisk
+
+# And when the container is started, run asterisk
+ENTRYPOINT [ "/usr/sbin/asterisk", "-f" ]

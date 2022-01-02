@@ -1,0 +1,41 @@
+[log]
+  level = "DEBUG"
+  filePath = "log-file.log"
+
+[accessLog]
+  filePath =  "log-access.log"
+  
+
+
+
+[api]
+  dashboard = true
+  debug = true
+  insecure = true
+
+[entryPoints]
+  [entryPoints.web]
+    address = ":80"
+  [entryPoints.asterisk]
+    address = ":5060"
+[tcp]
+  [tcp.routers]
+    [tcp.routers.to-asterisk-tcp]
+      entryPoints = ["asterisk"]
+      rule = "HostSNI(`*`)"
+      service = "asterisk"
+[udp]
+  [udp.routers]
+    [udp.routers.to-asterisk-udp]   
+      entryPoints = ["asterisk"]
+      rule = "HostSNI(`*`)"
+      service = "asterisk"
+[providers.file]
+  filename = "traefik_dynamic.toml"
+
+[providers.docker]   
+  watch = true
+  network = "traefik"
+   
+
+

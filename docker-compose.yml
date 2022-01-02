@@ -6,23 +6,28 @@ services:
     volumes:
       - /root/data/:/var/lib/mysql:rw
       - ./DataBase/mysql-5.x/:/database/
-      - ./a2billing.conf:/etc/a2billing.conf
     container_name: mysql
     environment:
       MYSQL_ROOT_PASSWORD: P@ssw0rd
       MYSQL_DATABASE: mya2billing 
       MYSQL_USER: a2billinguser
       MYSQL_PASSWORD: a2billing
-    labels:
-      - traefik.enable=false
+    #labels:
+    #  - traefik.enable=false
     networks:
-      - web
+      - traefik
   asterisk:
     image: asterisk
     restart: always
     container_name: asterisk
+    labels:
+      - "traefik.backend=asterisk"
+      - "traefik.tcp.routers.asterisk.rule=HostSNI(`*`)"
+      - "traefik.tcp.routers.asterisk.entrypoints=asterisk"
+      - "traefik.tcp.routers.asterisk.rule=Host(`www.voip.com`)"
+      - "traefik.port=5060"
     networks:
-      - web
+      - traefik
     depends_on:
       - mysql
   admin:
@@ -30,11 +35,13 @@ services:
     restart: always
     container_name: admin
     labels:
-      - traefik.http.routers.admin.rule=Host(`admin.voip.com`)
-      - traefik.port=80
-    
+      - "traefik.backend=admin"
+      - "traefik.http.routers.admin.rule=Host(`www.voip.com`) && PathPrefix(`/admin`)"
+      - "traefik.http.routers.admin.tls=false"
+      - "traefik.port=80"
     networks:
-      - web
+      - traefik
+     
     depends_on:
       - mysql
   customer:
@@ -42,11 +49,12 @@ services:
     restart: always
     container_name: customer
     labels:
-      - traefik.http.routers.customer.rule=Host(`customer.voip.com`)
-      - traefik.port=80
-    
+      - "traefik.backend=customer"
+      - "traefik.http.routers.customer.rule=Host(`www.voip.com`) && PathPrefix(`/customer`)"
+      - "traefik.http.routers.customer.tls=false"
+      - "traefik.port=80"
     networks:
-      - web
+      - traefik
     depends_on:
       - mysql
   traefik:
@@ -57,15 +65,17 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./traefik/traefik.toml:/traefik.toml
       - ./traefik/traefik_dynamic.toml:/traefik_dynamic.toml
-
     networks:
-      - web
+      - traefik
+      - internal
     ports:
     - "80:80"
-    - "5060:5060"
-
+    - "5060:5060/tcp"
+    - "5060:5060/udp"
+    - "8080:8080"
 networks:
-  web:
-    driver: bridge
-    name: web
+  traefik:
+    external: true
+  internal:
+    external: false
 

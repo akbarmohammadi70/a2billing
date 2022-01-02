@@ -34,16 +34,16 @@ echo "--------------------------"
 echo ""
 
 echo "Enter Database Name : "
-read dbname
+dbname=mya2billing
 
 echo "Enter Hostname : "
-read hostname
+hostname=localhost
 
 echo "Enter UserName : "
-read username
+username=a2billinguser
 
 echo "Enter Password : "
-read password
+password=a2billing
 
 echo mysql --user=$username --password=$password --host=$hostname $dbname
 

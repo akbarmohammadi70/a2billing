@@ -1,11 +1,11 @@
 #!/bin/bash
-#MAINTAINER Akbar Mohammadi ; akbar.mohammadi70@gmail.com       
+oMAINTAINER Akbar Mohammadi ; akbar.mohammadi70@gmail.com     
 
 launch() {
     sudo cat ./hosts >> /etc/hosts
     docker-compose up -d
-    docker exec -i mysql cat /database/a2billing-createdb-user.sql | /usr/bin/mysql -u a2billinguser --password=a2billing mya2billing
-    docker exec -i mysql /database/install-db.sh
+    docker exec -i mysql sh -c ' mysql --user=root --password=P@ssw0rd < /database/a2billing-createdb-user.sql'
+    docker exec -i mysql sh -c ' /database/install-db.sh'
     echo "Please enter a key"
     read sleep6
 }

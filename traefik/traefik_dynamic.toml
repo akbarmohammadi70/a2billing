@@ -1,18 +1,10 @@
-[http.middlewares.simpleAuth.basicAuth]
- 
-users = [
- 
-"admin:admin:$apr1$tNRh/vr6$Ick9R9pGk4nbaNGd0L7QY/"
- 
-]
+[http.middlewares.auth.basicAuth] 
+  users = [
+    "admin:admin:$apr1$tNRh/vr6$Ick9R9pGk4nbaNGd0L7QY/"
+  ]
  
 [http.routers.api]
- 
-rule = "Host(`monitor.voip.com`)"
- 
-entrypoints = ["web"]
- 
-middlewares = ["simpleAuth"]
- 
-service = "api@internal"
+  rule = "Host(`www.voip.com`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`)"
+  middlewares = ["auth"]
+  service = "api@internal"
  
