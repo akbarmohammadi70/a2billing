@@ -16,7 +16,7 @@
 [entryPoints]
   [entryPoints.web]
     address = ":80"
-  [entryPoints.tcp-asterisk]
+  [entryPoints.asterisk]
     address = ":5060"
   [entryPoints.udp-asterisk]
     address = ":5060/udp" 
