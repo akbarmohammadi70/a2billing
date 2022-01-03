@@ -21,11 +21,12 @@ services:
     restart: always
     container_name: asterisk
     labels:
-      - "traefik.backend=asterisk"
+      - "traefik.enable=true"
       - "traefik.tcp.routers.asterisk.rule=HostSNI(`*`)"
       - "traefik.tcp.routers.asterisk.entrypoints=asterisk"
-      - "traefik.tcp.routers.asterisk.rule=Host(`www.voip.com`)"
-      - "traefik.port=5060"
+      - "traefik.tcp.routers.asterisk.service=asterisk"
+      - "traefik.tcp.services.asterisk.loadbalancer.server.port=5060"
+     
     networks:
       - traefik
     depends_on:
@@ -76,6 +77,5 @@ services:
 networks:
   traefik:
     external: true
-  internal:
-    external: false
+ 
 
