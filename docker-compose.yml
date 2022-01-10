@@ -68,7 +68,7 @@ services:
       - ./traefik/traefik_dynamic.toml:/traefik_dynamic.toml
     networks:
       - traefik
-      - internal
+      
     ports:
     - "80:80"
     - "5060:5060/tcp"
